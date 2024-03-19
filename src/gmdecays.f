@@ -988,7 +988,7 @@ C G5P3P3N is pure imaginary; remove the i (since it gets mod-squared).
       H5PGAMH3PN = GAMHH(1.D0,MH5,MH3,MH3,G5P3P3N)
 
 C H5P decay to W gamma:
-      H5PGAMWGA = HETLOOPH5WGA()
+      H5PGAMWGA = HETLOOPH5WGA(Q**2)
 
 C Compute the total width
       H5PWDTH = H5PGAMWZ + H5PGAMZH3P + H5PGAMWH3N + H5PGAMH3PN
