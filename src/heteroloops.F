@@ -21,10 +21,10 @@ C Calculations of the one-loop decay widths:
 C=====================================================================
 C H5+ --> W+ gamma
 C=====================================================================
-      DOUBLE PRECISION FUNCTION HETLOOPH5WGA(Q**2)
+      DOUBLE PRECISION FUNCTION HETLOOPH5WGA(Q2)
       IMPLICIT NONE
 C Common blocks:
-      DOUBLE Q
+      DOUBLE PRECISION Q2
       DOUBLE PRECISION MU2SQ,MU3SQ,LAMBDA1,LAMBDA2,LAMBDA3,LAMBDA4,
      .     LAMBDA5,M1,M2
       COMMON/LPARAMS/MU2SQ,MU3SQ,LAMBDA1,LAMBDA2,LAMBDA3,LAMBDA4,
@@ -63,11 +63,6 @@ C Local variables:
       L4 = LAMBDA4
       L5 = LAMBDA5
 
-      IF (MH5.LE.MW) THEN
-         HETLOOPH5WGA = 0.D0
-         RxH5PWGA = 0.D0
-         IxH5PWGA = 0.D0
-      ELSE
 
          S = (0.D0,0.D0)
 
@@ -79,46 +74,44 @@ C This first coupling has an i removed:
 
 C H30 H3- H3- loop:
       S = S - ALPHAEM*(-1.D0)/PI*(1.D0/2.D0/SW)*GH3NH3PH5M
-     .     * LOOPSSS(Q**2,MH5**2,MH3**2,MH3**2)
+     .     * LOOPSSS(Q2,MH5**2,MH3**2,MH3**2)
 C H50 H5- H5- loop:
       S = S - ALPHAEM*(-1.D0)/PI*(DSQRT(3.D0)/2.D0/SW)*GH5PH5MH5N
-     .     * LOOPSSS(Q**2,MH5**2,MH5**2,MH5**2)
+     .     * LOOPSSS(Q2,MH5**2,MH5**2,MH5**2)
 C H5- H5-- H5-- loop:
       S = S - ALPHAEM*(-2.D0)/PI*(-1.D0/DSQRT(2.D0)/SW)*GH5PH5PH5MM
-     .     * LOOPSSS(Q**2,MH5**2,MH5**2,MH5**2)
+     .     * LOOPSSS(Q2,MH5**2,MH5**2,MH5**2)
 C H5++ H5+ H5+ loop:
       S = S - ALPHAEM*(1.D0)/PI*(1.D0/DSQRT(2.D0)/SW)*GH5PH5PH5MM
-     .     * LOOPSSS(Q**2,MH5**2,MH5**2,MH5**2)
+     .     * LOOPSSS(Q2,MH5**2,MH5**2,MH5**2)
 
 C Z H5- H5- loop:
       S = S - ALPHAEM**2*(-1.D0)*(1.D0-2.D0*SW**2)/CW/SW
      .     * (-DSQRT(2.D0)*VCHI/2.D0/CW/SW**2) / MZ**2
-     .     * LOOPVSS(Q**2,MH5**2,MZ**2,MH5**2)
+     .     * LOOPVSS(Q2,MH5**2,MZ**2,MH5**2)
 C W- H5-- H5-- loop:
       S = S - ALPHAEM**2*(-2.D0)*(1.D0/DSQRT(2.D0)/SW)
      .     * 2.D0*VCHI/SW**2 / MW**2
-     .     * LOOPVSS(Q**2,MH5**2,MW**2,MH5**2)
+     .     * LOOPVSS(Q2,MH5**2,MW**2,MH5**2)
 
 C H50 W- W- loop:
       S = S + ALPHAEM**2*(-1.D0)*(-DSQRT(3.D0)/2.D0/SW)
      .     * DSQRT(2.D0/3.D0)*VCHI/SW**2 / 2.D0/MW**2
-     .     * LOOPSVV(Q**2,MH5**2,MH5**2,MW**2)
+     .     * LOOPSVV(Q2,MH5**2,MH5**2,MW**2)
 C H5++ W+ W+ loop:
       S = S + ALPHAEM**2*(1.D0)*(1.D0/DSQRT(2.D0)/SW)
      .     * 2.D0*VCHI/SW**2 / 2.D0/MW**2
-     .     * LOOPSVV(Q**2,MH5**2,MH5**2,MW**2)
+     .     * LOOPSVV(Q2,MH5**2,MH5**2,MW**2)
 
 C Z W- W- loop:
       S = S + ALPHAEM**2/2.D0*(-1.D0)*(CW/SW)
      .     *(-DSQRT(2.D0)*VCHI/CW/SW**2)
-     .     * LOOPVVV(Q**2,MH5**2,MZ**2,MW**2)
+     .     * LOOPVVV(Q2,MH5**2,MZ**2,MW**2)
 
       RxH5PWGA = REAL(S)
       IxH5PWGA = AIMAG(S)
       HETLOOPH5WGA = MH5**3/32.D0/PI * (1.D0 - MW**2/MH5**2)**3
      .     * CDABS(S)**2
-
-      ENDIF
 
       RETURN
       END

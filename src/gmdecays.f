@@ -971,6 +971,18 @@ C WZ non-identical bosons: symmetry factor SV = 1.
          H5PGAMWZ = GAMVV(1.D0,MH5,MW,MZ,2.D0*MW*MZ/V*KV)
       ENDIF
 
+C H5P decays to W+ and gamma 
+C W+gamma non-identical bosons: symmetry factor SV = 1.
+      IF (OFFSHELL.EQ.1) THEN
+         H5PGAMWGA = GAMVGAMMAOF(1.D0,MH5,MV,GA)
+      ELSE
+         IF  (MH5 .gt. MW)
+            H5PGAMWGA = HETLOOPH5WGA(MW**2)
+         ELSE
+            H5PGAMWGA = 0.D0
+         ENDIF
+      ENDIF
+      
 C H5P decays to vector + scalar:
 C On-shell above threshold, V off-shell below threshold.
 C CW35 is pure imaginary; remove the i (since it gets mod-squared).
