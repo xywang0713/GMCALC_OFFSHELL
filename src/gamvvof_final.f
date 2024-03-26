@@ -141,7 +141,7 @@ C variables to be passed to gvgammaofintfng
 C Common block is initialized here before one calls gvgammaofintfng
       DOUBLE PRECISION SV,MH5,MV,GA
       DOUBLE PRECISION SVP,MH5P,MVP,GAP
-      COMMON/GVVOFPARAMS/SVP,MH5P,MVP,GAP
+      COMMON/GAMVGAMMAOFPARAMS/SVP,MH5P,MVP,GAP
 
 C variables used by the INTEG subroutine from vegas?
       INTEGER IDIM
@@ -166,8 +166,7 @@ C functions called
       ITER1 = 3
       ACC = 1.D-03
       
-      DATA VAR = 0.4
-
+      DATA VAR / 0.4 /
 C Make a call to the function to be integrated, so that INTEG
 C recognizes it as a function.
       DUMMYVAR = GVGAMMAOFINTFNG(VAR)
@@ -177,17 +176,17 @@ C Initialize vegas
       
       CALL INTEG(GVGAMMAOFINTFNG,IDIM,IPOINT,ITER,IPOINT1,ITER1,ACC,RES)
       
-      GVGAMMAOFINTFNG = RES
+      GAMVGAMMAOFVEGAS = RES
       END FUNCTION
 
 
       DOUBLE PRECISION FUNCTION GVGAMMAOFINTFNG(VAR)
-C VAR(1) is between 0 and 1.
+C VAR is between 0 and 1.
       IMPLICIT NONE
       DOUBLE PRECISION VAR
       DOUBLE PRECISION PI
 C Denormalized variables
-      DOUBLE PRECISION Q,QMIN,QMAX
+      DOUBLE PRECISION Q2,QMIN,QMAX
 C Parts of overall function to be integrated
       DOUBLE PRECISION DRDQ
 C Ratios between VARs and Qs
@@ -197,6 +196,8 @@ C Denormalized function value
 C Common block must be initialized by calling program
       DOUBLE PRECISION SV,MH5,MV,GA
       COMMON/GVVOFPARAMS/SV,MH5,MV,GA
+C Function to be called
+      DOUBLE PRECISION HETLOOPH5WGA
       
       PI = 4.D0*DATAN(1.D0)
 
@@ -208,7 +209,7 @@ C Common block must be initialized by calling program
       Q2 = QMIN + DQDVAR * VAR
 
       DRDQ = (MH5**2/PI)*(Q2/MV**2)*(MV*GA) / 
-                    (MV**2 * GA**2 + (Q2 - MV**2)**2)
+     .           (MV**2 * GA**2 + (Q2 - MV**2)**2)
 
       GVGAMMA_FN = DRDQ * HETLOOPH5WGA(Q2)
 

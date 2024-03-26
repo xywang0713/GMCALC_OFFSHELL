@@ -957,7 +957,8 @@ C Local variables:
       DOUBLE PRECISION CW, SW
       DOUBLE PRECISION CZ35, CW35, G5P3P3N
 C Functions to be called:
-      DOUBLE PRECISION GAMVVOF, GAMVV, GAMWH, GAMZH, GAMHH
+      DOUBLE PRECISION GAMVVOF, GAMVV, GAMWH, GAMZH, GAMHH, 
+     . GAMVGAMMAOFVEGAS
       DOUBLE PRECISION HETLOOPH5WGA
       CW = MW/MZ
       SW = DSQRT(1.D0 - CW**2)
@@ -971,18 +972,7 @@ C WZ non-identical bosons: symmetry factor SV = 1.
          H5PGAMWZ = GAMVV(1.D0,MH5,MW,MZ,2.D0*MW*MZ/V*KV)
       ENDIF
 
-C H5P decays to W+ and gamma 
-C W+gamma non-identical bosons: symmetry factor SV = 1.
-      IF (OFFSHELL.EQ.1) THEN
-         H5PGAMWGA = GAMVGAMMAOF(1.D0,MH5,MV,GA)
-      ELSE
-         IF  (MH5 .gt. MW)
-            H5PGAMWGA = HETLOOPH5WGA(MW**2)
-         ELSE
-            H5PGAMWGA = 0.D0
-         ENDIF
-      ENDIF
-      
+
 C H5P decays to vector + scalar:
 C On-shell above threshold, V off-shell below threshold.
 C CW35 is pure imaginary; remove the i (since it gets mod-squared).
@@ -1000,7 +990,16 @@ C G5P3P3N is pure imaginary; remove the i (since it gets mod-squared).
       H5PGAMH3PN = GAMHH(1.D0,MH5,MH3,MH3,G5P3P3N)
 
 C H5P decay to W gamma:
-      H5PGAMWGA = HETLOOPH5WGA(Q**2)
+C W+gamma non-identical bosons: symmetry factor SV = 1.
+      IF (OFFSHELL.EQ.1) THEN
+         H5PGAMWGA = GAMVGAMMAOFVEGAS(1.D0,MH5,MW,GAMW)
+      ELSE
+         IF  (MH5 .gt. MW) THEN
+            H5PGAMWGA = HETLOOPH5WGA(MW**2)
+         ELSE
+            H5PGAMWGA = 0.D0
+         ENDIF
+      ENDIF
 
 C Compute the total width
       H5PWDTH = H5PGAMWZ + H5PGAMZH3P + H5PGAMWH3N + H5PGAMH3PN
