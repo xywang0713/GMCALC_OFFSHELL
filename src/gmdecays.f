@@ -1001,6 +1001,9 @@ C W+gamma non-identical bosons: symmetry factor SV = 1.
          ENDIF
       ENDIF
 
+      PRINT * , "H5PWGAMWIDTH=" , H5PGAMWGA
+
+
 C Compute the total width
       H5PWDTH = H5PGAMWZ + H5PGAMZH3P + H5PGAMWH3N + H5PGAMH3PN
      .     + H5PGAMWGA

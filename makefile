@@ -5,8 +5,8 @@
 
 # put the path to LoopTools here (tested with LoopTools 2.15 & 2.16)
 #LT = $(HOME)/Documents/work/looptools/LoopTools-2.15/x86_64-Darwin
-LT = $(HOME)/Documents/work/looptools/LoopTools-2.16/arm64-Darwin
-LIB = lib   # use this if libooptools.a is in $LT/lib
+LT = $(HOME)/GM/LoopTools
+LIB = lib64  # use this if libooptools.a is in $LT/lib
 # LIB = lib64 # use this if libooptools.a is in $LT/lib64
 
 # put the path to HiggsSignals 2 and HiggsBounds 5 here

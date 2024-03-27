@@ -137,8 +137,8 @@ C Common block must be initialized by calling program
 C Offshell Gamma(H5p -> V gamma) numerical integration routine.
 C Symmetry factor: SV = 1.
       IMPLICIT NONE
-C variables to be passed to gvgammaofintfng
-C Common block is initialized here before one calls gvgammaofintfng
+C variables to be passed to gvgammaofintfnq
+C Common block is initialized here before one calls gvgammaofintfnq
       DOUBLE PRECISION SV,MH5,MV,GA
       DOUBLE PRECISION SVP,MH5P,MVP,GAP
       COMMON/GAMVGAMMAOFPARAMS/SVP,MH5P,MVP,GAP
@@ -152,12 +152,17 @@ C variables used by the INTEG subroutine from vegas?
       DOUBLE PRECISION DUMMYVAR
 
 C functions called
-      DOUBLE PRECISION GVGAMMAOFINTFNG
+      DOUBLE PRECISION GVGAMMAOFINTFNQ
 
       SVP = SV
       MH5P = MH5
       MVP = MV
       GAP = GA
+
+      PRINT *, "SV=" , SVP
+      PRINT *, "MH5=" , MH5P
+      PRINT *, "MV=" , MVP
+      PRINT *, "GAP =" , GAP
 
       IDIM = 1
       IPOINT = 10000
@@ -169,19 +174,22 @@ C functions called
       DATA VAR / 0.4 /
 C Make a call to the function to be integrated, so that INTEG
 C recognizes it as a function.
-      DUMMYVAR = GVGAMMAOFINTFNG(VAR)
+      DUMMYVAR = GVGAMMAOFINTFNQ(VAR)
+
+      PRINT * , "DUMMYVAR=" ,DUMMYVAR
 
 C Initialize vegas
       CALL RSTART(12,34,56,78)
       
-      CALL INTEG(GVGAMMAOFINTFNG,IDIM,IPOINT,ITER,IPOINT1,ITER1,ACC,RES)
+      CALL INTEG(GVGAMMAOFINTFNQ,IDIM,IPOINT,ITER,IPOINT1,ITER1,ACC,RES)
       
-      GAMVGAMMAOFVEGAS = RES
+      GVGAMMAOFINTFNG = RES
       END FUNCTION
 
+ 
 
       DOUBLE PRECISION FUNCTION GVGAMMAOFINTFNG(VAR)
-C VAR is between 0 and 1.
+C VAR(1) is between 0 and 1.
       IMPLICIT NONE
       DOUBLE PRECISION VAR
       DOUBLE PRECISION PI
@@ -196,8 +204,6 @@ C Denormalized function value
 C Common block must be initialized by calling program
       DOUBLE PRECISION SV,MH5,MV,GA
       COMMON/GVVOFPARAMS/SV,MH5,MV,GA
-C Function to be called
-      DOUBLE PRECISION HETLOOPH5WGA
       
       PI = 4.D0*DATAN(1.D0)
 
@@ -213,9 +219,11 @@ C Function to be called
 
       GVGAMMA_FN = DRDQ * HETLOOPH5WGA(Q2)
 
-      GVGAMMAOFINTFNG = DQDVAR * GVGAMMA_FN
+      GVGAMMAOFINTFNQ = DQDVAR * GVGAMMA_FN
 
       END FUNCTION
+
+      
 
 
       DOUBLE PRECISION FUNCTION GAMVVOFGL16(SV,MH,MV1,MV2,GA1,GA2,C)
