@@ -18,7 +18,7 @@ C relative to MV1+MV2.
 C Functions to be called
       DOUBLE PRECISION GAMVVOFVEGAS
       DOUBLE PRECISION GAMVVOFGL16
-      
+
       IF (MH.GT.(MV1+MV2)) THEN
 C We are above threshold.
       GAMVVOF = GAMVVOFGL16(SV,MH,MV1,MV2,GA1,GA2,C)
@@ -41,13 +41,13 @@ C Common block is initialized here before one calls gvvofintfnq
       DOUBLE PRECISION SV,MH,MV1,MV2,GA1,GA2,C
       DOUBLE PRECISION SVP,MHP,MV1P,MV2P,GA1P,GA2P,CP
       COMMON/GVVOFPARAMS/SVP,MHP,MV1P,MV2P,GA1P,GA2P,CP
-      
+
 C variables used by the INTEG subroutine from vegas
       INTEGER IDIM
       INTEGER IPOINT, ITER, IPOINT1, ITER1
       DOUBLE PRECISION ACC, RES
       DOUBLE PRECISION VAR(2)
-      
+
       DOUBLE PRECISION DUMMYVAR
 
 C functions called
@@ -60,25 +60,25 @@ C functions called
       GA1P = GA1
       GA2P = GA2
       CP = C
-      
+
       IDIM = 2
       IPOINT = 10000
       ITER = 3
       IPOINT1 = 10000
       ITER1 = 3
       ACC = 1.D-03
-      
+
       DATA VAR /0.4,0.4/
-      
+
 C Make a call to the function to be integrated, so that INTEG
 C recognizes it as a function.
       DUMMYVAR = GVVOFINTFNQ(VAR)
-      
+
 C Initialize vegas
       CALL RSTART(12,34,56,78)
-      
+
       CALL INTEG(GVVOFINTFNQ,IDIM,IPOINT,ITER,IPOINT1,ITER1,ACC,RES)
-      
+
       GAMVVOFVEGAS = RES
       END FUNCTION
 
@@ -101,25 +101,25 @@ C functions to be called
 C Common block must be initialized by calling program
       DOUBLE PRECISION SV,MH,MV1,MV2,GA1,GA2,C
       COMMON/GVVOFPARAMS/SV,MH,MV1,MV2,GA1,GA2,C
-      
+
       PI = 4.D0*DATAN(1.D0)
-      
+
       Q1MIN = 0.D0
       Q2MIN = 0.D0
       Q1MAX = MH
       Q2MAX = MH
-      
+
       DQ1DVAR1 = Q1MAX - Q1MIN
       DQ2DVAR2 = Q2MAX - Q2MIN
-      
+
       Q1 = Q1MIN + DQ1DVAR1 * VAR(1)
       Q2 = Q2MIN + DQ2DVAR2 * VAR(2)
-      
+
       DR1DQ1 = (2/PI)*(MV1*GA1*Q1) /
      .            (MV1**2 * GA1**2 + (Q1**2-MV1**2)**2)
       DR2DQ2 = (2/PI)*(MV2*GA2*Q2) /
      .            (MV2**2 * GA2**2 + (Q2**2-MV2**2)**2)
-      
+
       IF ((Q1 .GT. 0.D0) .AND.
      .      (Q2 .GT. 0.D0) .AND.
      .         (MH - Q1 - Q2 .GT. 0.D0)) THEN
@@ -129,12 +129,13 @@ C Common block must be initialized by calling program
          GVVOFINTFNQ = DQ1DVAR1 * DQ2DVAR2 * GAMVVOF_FN
       ELSE
          GVVOFINTFNQ = 0.D0
-      ENDIF 
+      ENDIF
       END FUNCTION
 
 
       DOUBLE PRECISION FUNCTION GAMVGAMMAOFVEGAS(SV,MH5,MV,GA)
 C Offshell Gamma(H5p -> V gamma) numerical integration routine.
+C Added by Xinyu Wang and Yongcheng
 C Symmetry factor: SV = 1.
       IMPLICIT NONE
 C variables to be passed to gvgammaofintfnq
@@ -143,7 +144,7 @@ C Common block is initialized here before one calls gvgammaofintfnq
       DOUBLE PRECISION SVP,MH5P,MVP,GAP
       COMMON/GAMVGAMMAOFPARAMS/SVP,MH5P,MVP,GAP
 
-C variables used by the INTEG subroutine from vegas?
+C variables used by the INTEG subroutine from vegas
       INTEGER IDIM
       INTEGER IPOINT, ITER, IPOINT1, ITER1
       DOUBLE PRECISION ACC, RES
@@ -165,12 +166,12 @@ C functions called
       PRINT *, "GAP =" , GAP
 
       IDIM = 1
-      IPOINT = 10000
-      ITER = 3
+      IPOINT = 5000
+      ITER = 2
       IPOINT1 = 10000
       ITER1 = 3
       ACC = 1.D-03
-      
+
       DATA VAR / 0.4 /
 C Make a call to the function to be integrated, so that INTEG
 C recognizes it as a function.
@@ -180,41 +181,42 @@ C recognizes it as a function.
 
 C Initialize vegas
       CALL RSTART(12,34,56,78)
-      
+
       CALL INTEG(GVGAMMAOFINTFNQ,IDIM,IPOINT,ITER,IPOINT1,ITER1,ACC,RES)
-      
-      GVGAMMAOFINTFNG = RES
+
+      GAMVGAMMAOFVEGAS = RES
+
       END FUNCTION
 
- 
 
-      DOUBLE PRECISION FUNCTION GVGAMMAOFINTFNG(VAR)
+
+      DOUBLE PRECISION FUNCTION GVGAMMAOFINTFNQ(VAR)
 C VAR(1) is between 0 and 1.
       IMPLICIT NONE
       DOUBLE PRECISION VAR
       DOUBLE PRECISION PI
 C Denormalized variables
-      DOUBLE PRECISION Q2,QMIN,QMAX
+      DOUBLE PRECISION Q2,Q2MIN,Q2MAX
 C Parts of overall function to be integrated
       DOUBLE PRECISION DRDQ
 C Ratios between VARs and Qs
       DOUBLE PRECISION DQDVAR
 C Denormalized function value
-      DOUBLE PRECISION GVGAMMA_FN
+      DOUBLE PRECISION GVGAMMA_FN, HETLOOPH5WGA
 C Common block must be initialized by calling program
       DOUBLE PRECISION SV,MH5,MV,GA
-      COMMON/GVVOFPARAMS/SV,MH5,MV,GA
-      
+      COMMON/GAMVGAMMAOFPARAMS/SV,MH5,MV,GA
+
       PI = 4.D0*DATAN(1.D0)
 
-      QMIN = 0.D0
-      QMAX = MH5
-      
-      DQDVAR = QMAX - QMIN
-      
-      Q2 = QMIN + DQDVAR * VAR
+      Q2MIN = 0.D0
+      Q2MAX = MH5**2
 
-      DRDQ = (MH5**2/PI)*(Q2/MV**2)*(MV*GA) / 
+      DQDVAR = Q2MAX - Q2MIN
+
+      Q2 = Q2MIN + DQDVAR * VAR
+
+      DRDQ = (MH5**2/PI)*(Q2/MV**2)*(MV*GA) /
      .           (MV**2 * GA**2 + (Q2 - MV**2)**2)
 
       GVGAMMA_FN = DRDQ * HETLOOPH5WGA(Q2)
@@ -223,7 +225,7 @@ C Common block must be initialized by calling program
 
       END FUNCTION
 
-      
+
 
 
       DOUBLE PRECISION FUNCTION GAMVVOFGL16(SV,MH,MV1,MV2,GA1,GA2,C)
@@ -256,18 +258,18 @@ C Weights of sample points
 C Functions to be called
       DOUBLE PRECISION GAMVV
       DOUBLE PRECISION RHO, QFROMRHO
-      
+
 C Set the limits of integration:
          R1I = RHO(0.D0,MV1,GA1)
          R1F = RHO(MH,MV1,GA1)
-         
+
 C The integral ranges from X1M-X1R to X1M+X1R
          X1M=0.5D0*(R1F+R1I)
          X1R=0.5D0*(R1F-R1I)
-         
+
          R2I = RHO(0.D0,MV2,GA2)
          GAMVVOFGL16 = 0.D0
-         
+
          DO 10 I = 1, GLPTSDIV2
             DX1 = X1R*X(I)
 C Sample point above the midpoint
@@ -279,13 +281,13 @@ C Sample point above the midpoint
             SLICE = 0.D0
             DO 20 J = 1, GLPTSDIV2
                DX2 = X2R*X(J)
-               
+
                R2 = X2M+DX2
                Q2 = QFROMRHO(R2,MV2,GA2)
                SLICE = SLICE + W(J)
      .              * Q1**2/MV1**2 * Q2**2/MV2**2
      .              * GAMVV(SV,MH,Q1,Q2,C)
-               
+
                R2 = X2M-DX2
                Q2 = QFROMRHO(R2,MV2,GA2)
                SLICE = SLICE + W(J)
@@ -303,13 +305,13 @@ C Sample point below the midpoint
             SLICE = 0.D0
             DO 30 J = 1, GLPTSDIV2
                DX2 = X2R*X(J)
-               
+
                R2 = X2M+DX2
                Q2 = QFROMRHO(R2,MV2,GA2)
                SLICE = SLICE + W(J)
      .              * Q1**2/MV1**2 * Q2**2/MV2**2
      .              * GAMVV(SV,MH,Q1,Q2,C)
-               
+
                R2 = X2M-DX2
                Q2 = QFROMRHO(R2,MV2,GA2)
                SLICE = SLICE + W(J)

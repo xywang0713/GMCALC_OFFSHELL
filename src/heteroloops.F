@@ -12,7 +12,7 @@ C linking heteroloops-dummy.F.)
 
       SUBROUTINE LTENDER
       IMPLICIT NONE
-#include "looptools.h"      
+#include "looptools.h"
       CALL LTEXI
       RETURN
       END
@@ -20,6 +20,8 @@ C linking heteroloops-dummy.F.)
 C Calculations of the one-loop decay widths:
 C=====================================================================
 C H5+ --> W+ gamma
+C Depending on Q2 (momentum square of W)
+C Modified by Xinyu Wang and Yongcheng Wu
 C=====================================================================
       DOUBLE PRECISION FUNCTION HETLOOPH5WGA(Q2)
       IMPLICIT NONE
@@ -64,7 +66,7 @@ C Local variables:
       L5 = LAMBDA5
 
 
-         S = (0.D0,0.D0)
+      S = (0.D0,0.D0)
 
 C This first coupling has an i removed:
       GH3NH3PH5M = -DSQRT(2.D0)/V**2*(-8.D0*L5*VCHI**3 + 4.D0*M1*VCHI**2
@@ -110,8 +112,12 @@ C Z W- W- loop:
 
       RxH5PWGA = REAL(S)
       IxH5PWGA = AIMAG(S)
-      HETLOOPH5WGA = MH5**3/32.D0/PI * (1.D0 - MW**2/MH5**2)**3
+      IF ( Q2 .gt. MH5**2 ) THEN
+         HETLOOPH5WGA = 0.D0
+      ELSE
+         HETLOOPH5WGA = MH5**3/32.D0/PI * (1.D0 - Q2/MH5**2)**3
      .     * CDABS(S)**2
+      ENDIF
 
       RETURN
       END
@@ -184,7 +190,7 @@ C This first coupling has an i removed:
       GH3PH3MH5N = DSQRT(2.D0/3.D0)/V**2 * (-8.D0*L5*VCHI**3
      .     + 4.D0*M1*VCHI**2 + (-4.D0*L5 + 2.D0*L3)*VPHI**2*VCHI
      .     + 3.D0*M2*VPHI**2)
-      GHLH3PH3M = 64.D0*L1*CA*VCHI**2*VPHI/V**2 
+      GHLH3PH3M = 64.D0*L1*CA*VCHI**2*VPHI/V**2
      .     - 8.D0/DSQRT(3.D0)*VPHI**2*VCHI/V**2*SA*(L3+3.D0*L4)
      .     - 4.D0/DSQRT(3.D0)*VCHI*M1/V**2
      .     *(SA*VCHI - DSQRT(3.D0)*CA*VPHI)
@@ -226,16 +232,16 @@ C H30 H5- H5- loop:
       S3S = S3S - ALPHAEM*(-1.D0)/PI * (-CH/2.D0/SW) * GH3NH3PH5M
      .     * LOOPSSS(MW**2,MH3**2,MH3**2,MH5**2)
 C H3- H5-- H5-- loop:
-      S3S = S3S - ALPHAEM*(-2.D0)/PI * (-CH/DSQRT(2.D0)/SW) 
+      S3S = S3S - ALPHAEM*(-2.D0)/PI * (-CH/DSQRT(2.D0)/SW)
      .     * GH3PH3PH5MM
      .     * LOOPSSS(MW**2,MH3**2,MH3**2,MH5**2)
 C H5++ H3+ H3+ loop:
-      S3S = S3S - ALPHAEM*(1.D0)/PI * (CH/DSQRT(2.D0)/SW) 
+      S3S = S3S - ALPHAEM*(1.D0)/PI * (CH/DSQRT(2.D0)/SW)
      .     * GH3PH3PH5MM
      .     * LOOPSSS(MW**2,MH3**2,MH5**2,MH3**2)
 
 C Z H5- H5- loop:
-      SVSS = -ALPHAEM**2*(-1.D0)*(-VPHI/2.D0/V/CW/SW) 
+      SVSS = -ALPHAEM**2*(-1.D0)*(-VPHI/2.D0/V/CW/SW)
      .     * (-DSQRT(2.D0)*VCHI/CW/SW**2) / MZ**2
      .     * LOOPVSS(MW**2,MH3**2,MZ**2,MH5**2)
 C W- H5-- H5-- loop:
@@ -246,7 +252,7 @@ C W- H5-- H5-- loop:
 C HL W- W- loop:
       SSVV = ALPHAEM**2*(-1.D0)
      .     *(-DSQRT(2.D0/3.D0)*(DSQRT(3.D0)*CA*VCHI/V + SA*VPHI/V)/SW)
-     .     *(-8.D0*DSQRT(3.D0)*SA*VCHI + 3.D0*CA*VPHI)/6.D0/SW**2 
+     .     *(-8.D0*DSQRT(3.D0)*SA*VCHI + 3.D0*CA*VPHI)/6.D0/SW**2
      .     / 2.D0/MW**2
      .     * LOOPSVV(MW**2,MH3**2,MHL**2,MW**2)
 C HH W- W- loop:
@@ -319,7 +325,7 @@ C (The functions I1 and I2 are defined in gmdecays.f.)
       DOUBLE COMPLEX I1, I2
 C Local variables:
       DOUBLE COMPLEX S
-      DOUBLE PRECISION TAUW, LAMBDAW, G533P, G555P, G555PP, 
+      DOUBLE PRECISION TAUW, LAMBDAW, G533P, G555P, G555PP,
      .     CZ11, CZ22, KW
       DOUBLE COMPLEX AW, A3P, A5P, A5PP, AS, AMP
       DOUBLE PRECISION L1, L2, L3, L4, L5
@@ -351,7 +357,7 @@ C Local variables:
       G555PP = -2.D0*DSQRT(6.D0)*(2.D0*L3*VCHI - M2)
       KW = 2.D0*DSQRT(2.D0/3.D0)*VCHI/V
 
-C SM amplitude for the W loop: 
+C SM amplitude for the W loop:
       AW = -CW/SW * (4.D0*(3.D0-SW**2/CW**2) * I2(TAUW,LAMBDAW)
      .     + ((1.D0+2.D0/TAUW)*SW**2/CW**2 - (5.D0+2.D0/TAUW))
      .     * I1(TAUW,LAMBDAW))
@@ -365,7 +371,7 @@ C Amplitudes for the scalar loops:
       A5PP = 2.D0*G555PP*CZ22*2.D0/MH5**2
      .     * I1(4.D0*MH5**2/MH5**2,4.D0*MH5**2/MZ**2)
       AS = A3P + A5P + A5PP
-C Combine the amplitudes (all are complex in general): 
+C Combine the amplitudes (all are complex in general):
       AMP = KW*AW + V/2.D0*AS
       S = -ALPHAEM/2.D0/PI/V * AMP
 
@@ -390,7 +396,7 @@ C W+ H5+ H5+ and W- H5- H5- loops:
 
 
 C############################################################################
-C Subroutines for the new "heterogeneous" loop functions for H5+ -> W+ gamma, 
+C Subroutines for the new "heterogeneous" loop functions for H5+ -> W+ gamma,
 C H50 -> Z gamma, and H3+ -> W+ gamma, computed using LoopTools.
 C K. Hartling and H.E. Logan, December 2015
 
@@ -413,7 +419,7 @@ C One vector and two scalars in the loop:
       DOUBLE PRECISION QSQ
 #include "looptools.h"
       QSQ = 0.D0
-      LOOPVSS = MVSQ * ((-2.D0) *( 
+      LOOPVSS = MVSQ * ((-2.D0) *(
      .     C0I(cc12,KSQ,QSQ,MHSQ,MVSQ,MSSQ,MSSQ)
      .     + C0I(cc22,KSQ,QSQ,MHSQ,MVSQ,MSSQ,MSSQ)
      .     + 2.D0*C0I(cc1,KSQ,QSQ,MHSQ,MVSQ,MSSQ,MSSQ)
@@ -467,13 +473,13 @@ C Three vectors in the loop:
      .     + 0.5D0*(C0I(cc12,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ)
      .     + C0I(cc22,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ)
      .     - C0I(cc2,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ))
-     .     + MZ**2/MW**2*(1.D0-MWSQ/MZSQ) 
+     .     + MZ**2/MW**2*(1.D0-MWSQ/MZSQ)
      .     * (C0I(cc12,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ)
      .     + C0I(cc22,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ)
      .     + 2.D0*C0I(cc1,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ)
      .     + 3.D0*C0I(cc2,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ)
      .     + 2.D0*C0I(cc0,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ))
-     .     + MHSQ/MW**2 
+     .     + MHSQ/MW**2
      .     * (C0I(cc12,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ)
      .     + C0I(cc22,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ)
      .     + C0I(cc2,KSQ,QSQ,MHSQ,MZSQ,MWSQ,MWSQ))
